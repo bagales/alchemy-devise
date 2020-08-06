@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Alchemy
   module Devise
     module Generators
       class InstallGenerator < Rails::Generators::Base
-        desc "Installs Alchemy Devise based authentication into your app."
+        desc 'Installs Alchemy Devise based authentication into your app.'
         source_root File.expand_path('templates', File.dirname(__FILE__))
 
         def copy_devise_config
@@ -18,9 +20,9 @@ module Alchemy
         end
 
         def append_assets
-          insert_into_file "vendor/assets/stylesheets/alchemy/admin/all.css",
-            "\n *= require alchemy/admin/alchemy-devise",
-            after: " *= require alchemy/admin"
+          insert_into_file 'vendor/assets/stylesheets/alchemy/admin/all.css',
+                           "\n *= require alchemy/admin/alchemy-devise",
+                           after: ' *= require alchemy/admin'
         end
       end
     end

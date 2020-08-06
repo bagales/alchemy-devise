@@ -1,31 +1,32 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require 'rails_helper'
+require_dependency 'alchemy/version'
 
 describe Alchemy::Admin::UserSessionsController do
   routes { Alchemy::Engine.routes }
 
   before do
-    @request.env["devise.mapping"] = Devise.mappings[:user]
+    @request.env['devise.mapping'] = Devise.mappings[:user]
   end
 
-  context "without users present" do
-    describe "#new" do
-      it "redirects to signup form" do
+  context 'without users present' do
+    describe '#new' do
+      it 'redirects to signup form' do
         get :new
         is_expected.to redirect_to(admin_signup_path)
       end
 
-      if Alchemy.gem_version <= Gem::Version.new("4.9")
-        context "with ssl enforced" do
+      if Alchemy.gem_version <= Gem::Version.new('4.9')
+        context 'with ssl enforced' do
           before do
             allow(controller).to receive(:ssl_required?).and_return(true)
           end
 
-          it "redirects to https" do
+          it 'redirects to https' do
             get :new
             is_expected.to redirect_to(
-              admin_login_url(protocol: "https", host: "test.host"),
+              admin_login_url(protocol: 'https', host: 'test.host')
             )
           end
         end
@@ -33,89 +34,89 @@ describe Alchemy::Admin::UserSessionsController do
     end
   end
 
-  context "with users present" do
+  context 'with users present' do
     let(:user) { create(:alchemy_admin_user) }
 
-    describe "#create" do
-      context "with valid user" do
-        let(:screen_size) { "1200x800" }
-        let(:user_params) { { login: user.login, password: "s3cr3t" } }
+    describe '#create' do
+      context 'with valid user' do
+        let(:screen_size) { '1200x800' }
+        let(:user_params) { { login: user.login, password: 's3cr3t' } }
 
         before { user }
 
-        context "without redirect path in session" do
-          it "redirects to dashboard" do
+        context 'without redirect path in session' do
+          it 'redirects to dashboard' do
             post :create, params: { user: user_params }
             expect(response).to redirect_to(admin_dashboard_path)
           end
         end
 
-        context "with redirect path in session" do
-          it "redirects to these params" do
+        context 'with redirect path in session' do
+          it 'redirects to these params' do
             session[:redirect_path] = admin_users_path
             post :create, params: { user: user_params }
             expect(response).to redirect_to(admin_users_path)
           end
         end
 
-        context "without valid params" do
-          it "renders login form" do
-            post :create, params: { user: { login: "" } }
+        context 'without valid params' do
+          it 'renders login form' do
+            post :create, params: { user: { login: '' } }
             is_expected.to render_template(:new)
           end
         end
       end
     end
 
-    describe "#destroy" do
+    describe '#destroy' do
       before do
         allow(controller).to receive(:store_user_request_time)
         allow(controller).to receive(:all_signed_out?)
-                               .and_return(false)
+          .and_return(false)
         authorize_user(user)
       end
 
-      it "should unlock all pages" do
+      it 'should unlock all pages' do
         expect(user).to receive(:unlock_pages!)
         delete :destroy
       end
 
-      context "comming from admin area" do
+      context 'comming from admin area' do
         before do
           allow_any_instance_of(ActionController::TestRequest).to receive(:referer) do
-            "/admin_users"
+            '/admin_users'
           end
         end
 
-        it "redirects to root" do
+        it 'redirects to root' do
           delete :destroy
           is_expected.to redirect_to(root_path)
         end
       end
 
-      context "no referer present" do
+      context 'no referer present' do
         before do
           allow_any_instance_of(ActionController::TestRequest).to receive(:referer) do
             nil
           end
         end
 
-        it "redirects to root" do
+        it 'redirects to root' do
           delete :destroy
           is_expected.to redirect_to(root_path)
         end
       end
 
-      context "referer not from admin area" do
+      context 'referer not from admin area' do
         before do
           allow_any_instance_of(ActionController::TestRequest).to receive(:referer) do
-            "/imprint"
+            '/imprint'
           end
         end
 
-        it "redirects to root" do
+        it 'redirects to root' do
           delete :destroy
-          is_expected.to redirect_to("/imprint")
+          is_expected.to redirect_to('/imprint')
         end
       end
     end

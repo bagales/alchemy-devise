@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Alchemy
   module BaseControllerExtension
     def self.prepended(base)
@@ -8,9 +10,7 @@ module Alchemy
 
     # Stores the users request time.
     def store_user_request_time
-      if alchemy_user_signed_in?
-        current_alchemy_user.store_request_time!
-      end
+      current_alchemy_user.store_request_time! if alchemy_user_signed_in?
     end
   end
 end

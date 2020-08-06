@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Alchemy::Admin::UsersController, type: :request do
@@ -7,26 +9,26 @@ RSpec.describe Alchemy::Admin::UsersController, type: :request do
 
   context 'with error happening while sending mail' do
     before do
-      allow_any_instance_of(Alchemy::Admin::BaseController).
-        to receive(:raise_exception?) { false }
-      allow_any_instance_of(Alchemy::User).
-        to receive(:deliver_welcome_mail) { raise(Net::SMTPAuthenticationError) }
+      allow_any_instance_of(Alchemy::Admin::BaseController)
+        .to receive(:raise_exception?) { false }
+      allow_any_instance_of(Alchemy::User)
+        .to receive(:deliver_welcome_mail) { raise(Net::SMTPAuthenticationError) }
     end
 
     context 'on create' do
       it 'does not raise DoubleRender error' do
-        expect {
-          post admin_users_path, params: {user: attributes_for(:alchemy_user).merge(send_credentials: '1')}
-        }.to_not raise_error
+        expect do
+          post admin_users_path, params: { user: attributes_for(:alchemy_user).merge(send_credentials: '1') }
+        end.to_not raise_error
       end
     end
 
     context 'on update' do
       it 'does not raise DoubleRender error' do
-        user =  create(:alchemy_member_user)
-        expect {
-          patch admin_user_path(user), params: {user: {send_credentials: '1'}}
-        }.to_not raise_error
+        user = create(:alchemy_member_user)
+        expect do
+          patch admin_user_path(user), params: { user: { send_credentials: '1' } }
+        end.to_not raise_error
       end
     end
   end
@@ -40,7 +42,6 @@ RSpec.describe Alchemy::Admin::UsersController, type: :request do
     it 'uses the custom admin path' do
       expect(admin_users_path).to eq('/backend/users')
     end
-
 
     after(:all) do
       Alchemy.admin_path = '/admin'

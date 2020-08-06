@@ -1,14 +1,15 @@
+# frozen_string_literal: true
+
 module Alchemy
   module Admin
     class UsersController < ResourcesController
-
-      before_action :set_roles, except: [:index, :destroy]
+      before_action :set_roles, except: %i[index destroy]
 
       load_and_authorize_resource class: Alchemy::User,
-        only: [:edit, :update, :destroy]
+                                  only: %i[edit update destroy]
 
       authorize_resource class: Alchemy::User,
-        only: [:index, :new, :signup, :create]
+                         only: %i[index new signup create]
 
       helper_method :while_signup?, :can_update_role?
 
@@ -16,8 +17,8 @@ module Alchemy
         @query = User.ransack(params[:q])
         @query.sorts = 'login asc' if @query.sorts.empty?
         @users = @query.result
-          .page(params[:page] || 1)
-          .per(items_per_page)
+                       .page(params[:page] || 1)
+                       .per(items_per_page)
       end
 
       def new
@@ -52,16 +53,14 @@ module Alchemy
         end
         deliver_welcome_mail
         render_errors_or_redirect @user,
-          admin_users_path,
-          Alchemy.t("User updated", :name => @user.name)
+                                  admin_users_path,
+                                  Alchemy.t('User updated', name: @user.name)
       end
 
       def destroy
         # User is fetched via before filter
         name = @user.name
-        if @user.destroy
-          flash[:notice] = Alchemy.t("User deleted", name: name)
-        end
+        flash[:notice] = Alchemy.t('User deleted', name: name) if @user.destroy
         do_redirect_to admin_users_path
       end
 
@@ -81,7 +80,7 @@ module Alchemy
 
       def secure_attributes
         if can_update_role?
-          User::PERMITTED_ATTRIBUTES + [{alchemy_roles: []}]
+          User::PERMITTED_ATTRIBUTES + [{ alchemy_roles: [] }]
         else
           User::PERMITTED_ATTRIBUTES
         end
@@ -92,7 +91,7 @@ module Alchemy
       end
 
       def signup_admin_or_redirect
-        @user.alchemy_roles = %w(admin)
+        @user.alchemy_roles = %w[admin]
         if @user.save
           flash[:notice] = Alchemy.t('Successfully signup admin user')
           sign_in :user, @user
@@ -107,8 +106,8 @@ module Alchemy
         @user.save
         deliver_welcome_mail
         render_errors_or_redirect @user,
-          admin_users_path,
-          Alchemy.t("User created", name: @user.name)
+                                  admin_users_path,
+                                  Alchemy.t('User created', name: @user.name)
       end
 
       def can_update_role?
@@ -116,9 +115,7 @@ module Alchemy
       end
 
       def deliver_welcome_mail
-        if @user.valid? && @user.send_credentials == '1'
-          @user.deliver_welcome_mail
-        end
+        @user.deliver_welcome_mail if @user.valid? && @user.send_credentials == '1'
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddIndexesToAlchemyUsers < ActiveRecord::Migration[4.2]
   def up
     add_index :alchemy_users, :firstname

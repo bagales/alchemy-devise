@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Alchemy
   class Notifications < ActionMailer::Base
-
     default(from: Config.get(:mailer)['mail_from'])
 
     def member_created(user)
@@ -8,7 +9,7 @@ module Alchemy
 
       mail(
         to: user.email,
-        subject: Alchemy.t("Your user credentials")
+        subject: Alchemy.t('Your user credentials')
       )
     end
 
@@ -17,16 +18,16 @@ module Alchemy
       @url = admin_url
       mail(
         to: user.email,
-        subject: Alchemy.t("Your Alchemy Login")
+        subject: Alchemy.t('Your Alchemy Login')
       )
     end
 
-    def reset_password_instructions(user, token, opts={})
+    def reset_password_instructions(user, token, _opts = {})
       @user = user
       @token = token
       mail(
         to: user.email,
-        subject: Alchemy.t("Reset password instructions")
+        subject: Alchemy.t('Reset password instructions')
       )
     end
   end

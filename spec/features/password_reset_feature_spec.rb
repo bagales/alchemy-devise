@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "Password reset feature." do
+describe 'Password reset feature.' do
   let(:user) { create(:alchemy_admin_user) }
 
-  it "User can visit password reset form." do
+  it 'User can visit password reset form.' do
     visit admin_new_password_path
 
     expect(page).to have_content('Password reset')
   end
 
-  it "User can request password reset." do
+  it 'User can request password reset.' do
     visit admin_new_password_path
 
     fill_in :user_email, with: user.email
@@ -19,7 +21,7 @@ describe "Password reset feature." do
       .to have_content('You will receive an email with instructions on how to reset your password in a few minutes.')
   end
 
-  it "User can change password." do
+  it 'User can change password.' do
     allow(Alchemy::User)
       .to receive(:reset_password_by_token)
       .and_return(user)

@@ -1,21 +1,23 @@
+# frozen_string_literal: true
+
 require 'devise/orm/active_record'
 require 'userstamp'
 
 module Alchemy
   class User < ActiveRecord::Base
-    PERMITTED_ATTRIBUTES = [
-      :firstname,
-      :lastname,
-      :login,
-      :email,
-      :language,
-      :password,
-      :password_confirmation,
-      :send_credentials,
-      :tag_list
-    ]
+    PERMITTED_ATTRIBUTES = %i[
+      firstname
+      lastname
+      login
+      email
+      language
+      password
+      password_confirmation
+      send_credentials
+      tag_list
+    ].freeze
 
-    devise *Alchemy.devise_modules
+    devise(*Alchemy.devise_modules)
 
     include Alchemy::Taggable
 
@@ -52,9 +54,9 @@ module Alchemy
         query = "%#{query.downcase}%"
 
         where arel_table[:login].lower.matches(query)
-          .or arel_table[:email].lower.matches(query)
-          .or arel_table[:firstname].lower.matches(query)
-          .or arel_table[:lastname].lower.matches(query)
+                                .or arel_table[:email].lower.matches(query)
+                                                      .or arel_table[:firstname].lower.matches(query)
+                                                                                .or arel_table[:lastname].lower.matches(query)
       end
     end
 
@@ -79,14 +81,14 @@ module Alchemy
     end
 
     def add_role(role)
-      self.alchemy_roles = self.alchemy_roles.push(role.to_s).uniq
+      self.alchemy_roles = alchemy_roles.push(role.to_s).uniq
     end
 
     # Returns true if the user ahs admin role
     def is_admin?
       has_role? 'admin'
     end
-    alias_method :admin?, :is_admin?
+    alias admin? is_admin?
 
     # Returns true if the user has the given role.
     def has_role?(role)
@@ -105,7 +107,7 @@ module Alchemy
     def pages_locked_by_me
       Page.locked_by(self).order(:updated_at)
     end
-    alias_method :locked_pages, :pages_locked_by_me
+    alias locked_pages pages_locked_by_me
 
     # Returns the firstname and lastname as a string
     #
@@ -118,17 +120,20 @@ module Alchemy
       if lastname.blank? && firstname.blank?
         login
       else
-        options = {:flipped => false}.merge(options)
+        options = { flipped: false }.merge(options)
         fullname = options[:flipped] ? "#{lastname}, #{firstname}" : "#{firstname} #{lastname}"
-        fullname.squeeze(" ").strip
+        fullname.squeeze(' ').strip
       end
     end
-    alias_method :name, :fullname
-    alias_method :alchemy_display_name, :fullname
+    alias name fullname
+    alias alchemy_display_name fullname
 
     # Returns true if the last request not longer ago then the logged_in_time_out
     def logged_in?
-      raise "Can not determine the records login state because there is no last_request_at column" if !respond_to?(:last_request_at)
+      unless respond_to?(:last_request_at)
+        raise 'Can not determine the records login state because there is no last_request_at column'
+      end
+
       !last_request_at.nil? && last_request_at > logged_in_timeout.seconds.ago
     end
 

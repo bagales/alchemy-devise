@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "Login: " do
-  context "If user is present" do
+describe 'Login: ' do
+  context 'If user is present' do
     let!(:user) do
       Alchemy::User.create!(
         login: 'admin',
@@ -18,13 +20,13 @@ describe "Login: " do
       allow(Alchemy::User).to receive_messages(count: 1)
     end
 
-    context "with Alchemy configuration" do
-      it "displays an login authentication field" do
+    context 'with Alchemy configuration' do
+      it 'displays an login authentication field' do
         visit '/admin/login'
         expect(page).to have_field('user_login')
       end
 
-      it "works" do
+      it 'works' do
         visit '/admin/login'
         fill_in 'user_login', with: user.login
         fill_in 'user_password', with: user.password
@@ -33,17 +35,17 @@ describe "Login: " do
       end
     end
 
-    context "with default Devise configuration" do
+    context 'with default Devise configuration' do
       before do
         Devise.authentication_keys = [:email]
       end
 
-      it "displays an email authentication field" do
+      it 'displays an email authentication field' do
         visit '/admin/login'
         expect(page).to have_field('user_email')
       end
 
-      it "works" do
+      it 'works' do
         visit '/admin/login'
         fill_in 'user_email', with: user.email
         fill_in 'user_password', with: user.password

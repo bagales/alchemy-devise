@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 require 'simplecov'
-if ENV['TRAVIS']
-  require "codeclimate-test-reporter"
-end
+require 'codeclimate-test-reporter' if ENV['TRAVIS']
 SimpleCov.start 'rails' do
   add_filter '/lib/alchemy/devise/version'
   add_filter '/lib/generators'
